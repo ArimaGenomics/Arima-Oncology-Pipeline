@@ -1,6 +1,6 @@
 ![alt text](https://arimagenomics.com/public/images/header-logo.png "Celebrating Science and Scientist")
 
-# Arima Capture HiC Pipeline using Arima-HiC<sup>+</sup> Kit
+# Arima Oncology Pipeline using Arima-HiC<sup>+</sup> Kit
 
 This pipeline is for analyzing capture HiC data with HiCUP and CHiCAGO pipelines for generating Arima Genomics QC metrics and output data files. The pipeline runs the standard HiCUP and CHiCAGO algorithms from https://www.bioinformatics.babraham.ac.uk/projects/hicup/ and https://bioconductor.org/packages/release/bioc/html/Chicago.html with some minor changes to the default parameters. These parameters have been optimized by internal benchmarking and have been found to optimize sensitivity and specificity. This pipeline will also generate shallow and deep sequencing QC metrics which can be copied into the Arima QC Worksheet for analysis. Additionally, the pipeline automatically generates metaplots for data QC and arc plots of chromatin loops for data visualization.
 
@@ -13,10 +13,10 @@ To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimageno
 ### Installing Arima CHiC
 
 ```
-git clone https://github.com/ArimaGenomics/CHiC.git
-cd CHiC
+git clone https://github.com/ArimaGenomics/Arima-Oncology-Pipeline
+cd Arima-Oncology-Pipeline
 tar xf chicagoTools.tar.gz
-chmod 755 Arima-CHiC-v1.4.sh
+chmod 755 Arima-Oncology-Pipeline-v0.1.sh
 ```
 
 ### Installing Python 3.4 or later
@@ -149,7 +149,7 @@ conda install -c bioconda deeptools
 ```
 
 ## Usage (Command line options)
-Arima-CHiC-v1.4.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-P run_plot]
+Arima-Oncology-Pipeline-v0.1.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-P run_plot]
               [-A bowtie2] [-X bowtie2_index_basename] [-d digest] [-H hicup_dir] [-C chicago_dir]
               [-I FASTQ_string] [-o out_dir] [-p output_prefix] [-b BED] [-R RMAP] [-B BAITMAP]
               [-D design_dir] [-O organism] [-r resolution] [-t threads] [-v] [-h]
@@ -274,7 +274,7 @@ It also contains a reference folder, with one reference FASTA file (\*.fa), one 
 
 ## Arima Pipeline Version
 
-1.4
+0.1
 
 ## Support
 
