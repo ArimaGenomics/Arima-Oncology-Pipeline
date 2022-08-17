@@ -846,7 +846,6 @@ timestamp=`date '+%Y/%m/%d %H:%M:%S'`
 echo "Calculating enrichment score [$timestamp] ..."
 
 # Use the updated enrichment score calculation!
-# region_list=$out_hicup"/region_list.bed"
 # sed -e 's/chrx/chrX/g' -e 's/chry/chrY/g' -e 's/chrm/chrM/g' -e 's/"//g' $BED | cut -f4 | sed 's/,/\n/g' | sed 's/[:-]/\t/g' | sort -uV > $region_list
 target_size=$( cat $BED | awk '{ sum+=$3-$2 } END { printf("%d", sum) }' )
 off_target_size=$(( $genome_size - $target_size ))
@@ -866,6 +865,9 @@ echo off_target_size=$off_target_size
 echo ALL=$ALL
 echo on_target=$on_target
 echo off_target=$off_target
+echo on_target_p=$on_target_p
+#echo lcis_on_target=$lcis_on_target
+#echo lcis_on_target_p=$lcis_on_target_p
 echo background_RPKM=$background_RPKM
 enrichment=$(( $off_target_size * $on_target / $target_size / $off_target ))
 
@@ -907,12 +909,6 @@ echo on_target_probes=$on_target_probes
 echo dropout_probes=$dropout_probes
 echo percent_dropout_probes=$percent_dropout_probes
 echo coeff_of_var=$coeff_of_var
-
-#echo region_list=$region_list
-echo on_target=$on_target
-echo on_target_p=$on_target_p
-#echo lcis_on_target=$lcis_on_target
-#echo lcis_on_target_p=$lcis_on_target_p
 
 echo total_loops=$total_loops
 echo target_raw_pairs=$target_raw_pairs
