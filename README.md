@@ -10,7 +10,7 @@ This pipeline is suited for CHiC from any protocol but optimal results are obtai
 
 To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimagenomics.com/
 
-### Installing Arima CHiC
+### Installing Arima Oncology
 
 ```
 git clone https://github.com/ArimaGenomics/Arima-Oncology-Pipeline
