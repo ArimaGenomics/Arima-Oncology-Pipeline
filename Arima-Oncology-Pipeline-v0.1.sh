@@ -511,7 +511,7 @@ echo -e "HiCUP output: $hicup_output_bam_string\n"
 
 ### prober.py to calculate dropout rate and uniformity ###
 echo "Runnning prober to calculate dropout rate and uniformity ..."
-$cwd"/utils/prober2.3.py" -bam $hicup_output_bam_string -bed $BED -o $out_dir -prefix $output_prefix
+python $cwd"/utils/prober2.3.py" -bam $hicup_output_bam_string -bed $BED -o $out_dir -prefix $output_prefix
 prober_log=$out_dir"/"$output_prefix".prober.log"
 prober_counts=$out_dir"/"$output_prefix".counts"
 
@@ -918,16 +918,16 @@ printf "Enrichment score = %.2f\n" $enrichment
 QC_result_deep=$out_dir"/"$output_prefix"_Arima_QC_deep.txt"
 QC_result_shallow=$out_dir"/"$output_prefix"_Arima_QC_shallow.txt"
 
-header_deep=("Sample_name" "Raw_pairs" "Mapped_SE_reads" "%_Mapped_SE_reads" "Duplicated_pairs" "%_Duplicated_pairs" "Unique_valid_pairs" "%_Unique_valid_pairs" "Intra_pairs" "%_Intra_pairs" "Intra_ge_15kb_pairs" "%_Intra_ge_15kb_pairs" "Inter_pairs" "%_Inter_pairs" "%_on-target" "Enrichment" "Loops")
+header_deep=("Sample_name" "Raw_pairs" "Mapped_SE_reads" "%_Mapped_SE_reads" "Duplicated_pairs" "%_Duplicated_pairs" "Unique_valid_pairs" "%_Unique_valid_pairs" "Intra_pairs" "%_Intra_pairs" "Intra_ge_15kb_pairs" "%_Intra_ge_15kb_pairs" "Inter_pairs" "%_Inter_pairs" "%_on-target" "Enrichment" "Loops" "on_target_probes" "dropout_probes" "percent_dropout_probes" "coeff_of_var")
 IFS=$'\t'; echo "${header_deep[*]}" > $QC_result_deep
 
-result_deep=($output_prefix $raw_pairs $mapped_SE $mapped_p $duplicated_pairs $duplicated_pairs_p $uniq_valid_pairs $uniq_valid_pairs_p $intra_pairs $intra_pairs_p $intra_ge_15kb_pairs $intra_ge_15kb_pairs_p $inter_pairs $inter_pairs_p $on_target_p $enrichment $total_loops)
+result_deep=($output_prefix $raw_pairs $mapped_SE $mapped_p $duplicated_pairs $duplicated_pairs_p $uniq_valid_pairs $uniq_valid_pairs_p $intra_pairs $intra_pairs_p $intra_ge_15kb_pairs $intra_ge_15kb_pairs_p $inter_pairs $inter_pairs_p $on_target_p $enrichment $total_loops $on_target_probes $dropout_probes $percent_dropout_probes $coeff_of_var)
 IFS=$'\t'; echo "${result_deep[*]}" >> $QC_result_deep
 
-header_shallow=("Sample_name" "Raw_pairs" "Mapped_SE_reads" "%_Mapped_SE_reads" "Duplicated_pairs" "%_Duplicated_pairs" "Unique_valid_pairs" "%_Unique_valid_pairs" "Intra_pairs" "%_Intra_pairs" "Intra_ge_15kb_pairs" "%_Intra_ge_15kb_pairs" "Inter_pairs" "%_Inter_pairs" "%_on-target" "Enrichment" "Target_raw_pairs")
+header_shallow=("Sample_name" "Raw_pairs" "Mapped_SE_reads" "%_Mapped_SE_reads" "Duplicated_pairs" "%_Duplicated_pairs" "Unique_valid_pairs" "%_Unique_valid_pairs" "Intra_pairs" "%_Intra_pairs" "Intra_ge_15kb_pairs" "%_Intra_ge_15kb_pairs" "Inter_pairs" "%_Inter_pairs" "%_on-target" "Enrichment" "Target_raw_pairs" "on_target_probes" "dropout_probes" "percent_dropout_probes" "coeff_of_var")
 IFS=$'\t'; echo "${header_shallow[*]}" > $QC_result_shallow
 
-result_shallow=($output_prefix $raw_pairs $mapped_SE $mapped_p $duplicated_pairs $duplicated_pairs_p $uniq_valid_pairs $uniq_valid_pairs_p $intra_pairs $intra_pairs_p $intra_ge_15kb_pairs $intra_ge_15kb_pairs_p $inter_pairs $inter_pairs_p $on_target_p $enrichment $target_raw_pairs)
+result_shallow=($output_prefix $raw_pairs $mapped_SE $mapped_p $duplicated_pairs $duplicated_pairs_p $uniq_valid_pairs $uniq_valid_pairs_p $intra_pairs $intra_pairs_p $intra_ge_15kb_pairs $intra_ge_15kb_pairs_p $inter_pairs $inter_pairs_p $on_target_p $enrichment $target_raw_pairs $on_target_probes $dropout_probes $percent_dropout_probes $coeff_of_var)
 IFS=$'\t'; echo "${result_shallow[*]}" >> $QC_result_shallow
 
 timestamp=`date '+%Y/%m/%d %H:%M:%S'`
