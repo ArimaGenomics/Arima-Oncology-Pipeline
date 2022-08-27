@@ -10,7 +10,7 @@
 # IMPORTANT NOTE: bedtools v2.26 or later isn't compatible with CHiCAGO! Please use v2.25 instead!!!
 
 # Dependencies:
-# R 3.4.3 packages: argparse (v2.0.1), data.table, ggplot2, reshape2
+# R > 3.4.3 packages: argparser, data.table, RCurl, ggplot2
 # HTSLIB (v1.10.2)
 # samtools (v1.10)
 # bedtools (v2.25)
@@ -522,10 +522,10 @@ if [[ -f "$prober_log" && -f "$prober_counts" ]]; then
     percent_dropout_probes=$(tail -1 $prober_log | cut -f4)
     coeff_of_var=$(tail -1 $prober_log | cut -f5)
 
-    echo "Finished running prober!"
+    echo -e "Finished running prober!\n"
     rm $prober_log $prober_counts
 else
-    echo "WARNING: No *.prober.log or *.counts file can be found in $out_dir"
+    echo -e "WARNING: No *.prober.log or *.counts file can be found in $out_dir\n"
 fi
 
 #hicup_stat_1=$out_hicup"/hicup_truncater_summary_*.txt"
