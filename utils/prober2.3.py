@@ -3,7 +3,7 @@
 # Code refactoring: Xiang Zhou
 # Program: prober
 # Version: 2.3
-# Date: 08/17/2022
+# Date: 08/29/2022
 # Update note(s): tested code in python 3.4, 3.5, 3.6, 3.7, 3.8, and 3.9. The code successfully runs.
 
 # Input:
@@ -80,8 +80,8 @@ def run_probe_analysis(df, total_reads):
 	on_target = len(df[df['count'] >= 1])
 
 	# calculate percent_on_target
-	percent_drop_out =  drop_out / total_number_of_probes * 100
-	percent_drop_out = '{:.4f}'.format(percent_drop_out)
+	percent_drop_out = drop_out / total_number_of_probes * 100
+	percent_drop_out = '{:.1f}'.format(percent_drop_out)
 
 	# calculate Coefficient of Variation
 	Coefficient_of_Variation = stats.variation(list(df['count']), axis = 0)
@@ -104,13 +104,13 @@ def run_probe_analysis(df, total_reads):
 	dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
     # this is the header
-	writing_ar = ['total_number_of_reads','on_target_probes','dropout_probes', 'percent_dropout','CV', 'variance']
+	writing_ar = ['total_number_of_reads','on_target_probes','dropout_probes', 'percent_dropout','CV']
 	with open('{}/{}.prober.log'.format(outdir,prefix), 'w+') as f:
 
 		# writing the final data
 		#f.write('{}\n\n'.format(dt_string))
-		f.write ('\t'.join(writing_ar) + '\n')
-		f.write ('{}\t{}\t{}\t{}%\t{}\t{}\n'.format(total_reads, on_target, drop_out, percent_drop_out, Coefficient_of_Variation, variance))
+		f.write('\t'.join(writing_ar) + '\n')
+		f.write('{}\t{}\t{}\t{}\t{}\n'.format(total_reads, on_target, drop_out, percent_drop_out, Coefficient_of_Variation))
 
 	################################## 5. make a KDE plot of read counts distribution #####################
 
@@ -132,16 +132,16 @@ if bam_depth: #if the bam_depth option is used
 	if float(depth_ratio) < 1.0:
 
 		# writing the downsized BAM file
-		check_output("samtools view -bh {} | samtools view -b -s {} >{}/{}_{}.bam".format(bam, depth_ratio, outdir, prefix, bam_depth), shell=True)
+		check_output("samtools view -bh {} | samtools view -b -s {} > {}/{}_{}.bam".format(bam, depth_ratio, outdir, prefix, bam_depth), shell=True)
 
 		# running bedtools to generate BED file containing the number of reads per each probe
-		check_output("bedtools coverage -a {} -b {}/{}_{}.bam -counts >{}/{}.counts".format(bed, outdir, prefix, bam_depth, outdir, prefix), shell=True)
+		check_output("bedtools coverage -a {} -b {}/{}_{}.bam -counts > {}/{}.counts".format(bed, outdir, prefix, bam_depth, outdir, prefix), shell=True)
 
-		total_number_of_reads = check_output("samtools view -c {}/{}_{}.bam".format(outdir,prefix,bam_depth), shell=True)
+		total_number_of_reads = check_output("samtools view -c {}/{}_{}.bam".format(outdir, prefix, bam_depth), shell=True)
 		total_number_of_reads = total_number_of_reads.decode("utf-8")
 		total_number_of_reads = int( float(total_number_of_reads) )
 
-		fc_table = pd.read_csv('{}/{}.counts'.format(outdir,prefix), sep='\t', names=['chr','start','end','feature','count'])
+		fc_table = pd.read_csv('{}/{}.counts'.format(outdir, prefix), sep='\t', names=['chr', 'start', 'end', 'feature', 'count'])
 		# calculate the total number of probes from the BED file
 
 		# run the analysis to print the log file
@@ -152,9 +152,9 @@ if bam_depth: #if the bam_depth option is used
 		raise ValueError('The input BAM file reads cannot be smaller than or equal to the downsized BAM file! Please reduce the downsized BAM file size or run the command without the -bam_depth option')
 
 else: # else just run bedtools coverage on the full-depth BAM file
-	check_output("bedtools coverage -a {} -b {} -counts >{}/{}.counts".format(bed, bam, outdir, prefix), shell=True)
+	check_output("bedtools coverage -a {} -b {} -counts > {}/{}.counts".format(bed, bam, outdir, prefix), shell=True)
 
-	fc_table = pd.read_csv('{}/{}.counts'.format(outdir,prefix), sep='\t', names=['chr','start','end','feature','count'])
+	fc_table = pd.read_csv('{}/{}.counts'.format(outdir, prefix), sep='\t', names=['chr', 'start', 'end', 'feature', 'count'])
 	total_number_of_reads = int(check_output("samtools view -c {}".format(bam), shell=True))
 
 	# run the analysis to print the log file
