@@ -114,17 +114,17 @@ def run_probe_analysis(df, total_reads):
 
 	################################## 5. make a KDE plot of read counts distribution #####################
 
-	df['count'].plot.kde(linewidth=3, label = '{}'.format(prefix))
-	plt.xlabel('Counts', fontsize=16)
-	plt.ylabel('Density', fontsize=16)
-	plt.legend()
-	plt.xlim(-100, 500)
-	plt.title('{}\nCV={}, Var={}'.format(prefix,Coefficient_of_Variation, variance))
-	plt.savefig('{}/{}_kde_plot.pdf'.format(outdir,prefix), bbox_inches='tight')
+	#df['count'].plot.kde(linewidth=3, label = '{}'.format(prefix))
+	#plt.xlabel('Counts', fontsize=16)
+	#plt.ylabel('Density', fontsize=16)
+	#plt.legend()
+	#plt.xlim(-100, 500)
+	#plt.title('{}\nCoefficient of Variation={}, Variance={}'.format(prefix, Coefficient_of_Variation, variance))
+	#plt.savefig('{}/{}_kde_plot.pdf'.format(outdir, prefix), bbox_inches='tight')
 
 if bam_depth: #if the bam_depth option is used
 	# calculating the ratio required to get the downsized depth reads from input BAM
-	total_reads = check_output("samtools view -c {}".format (bam), shell = True)
+	total_reads = check_output("samtools view -c {}".format(bam), shell = True)
 	total_reads = int( float(total_reads.decode("utf-8")) )
 	depth_ratio = float( bam_depth / total_reads )
 

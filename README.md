@@ -15,8 +15,9 @@ To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimageno
 ```
 git clone https://github.com/ArimaGenomics/Arima-Oncology-Pipeline
 cd Arima-Oncology-Pipeline
+chmod 755 Arima-Oncology-Pipeline-v0.2.sh
+cd utils
 tar xf chicagoTools.tar.gz
-chmod 755 Arima-Oncology-Pipeline-v0.1.sh
 ```
 
 ### Installing Python 3.4 or later
@@ -40,6 +41,11 @@ conda install R
 ```
 # in R
 install.packages("argparser")
+install.packages("argparse")
+install.packages("data.table")
+install.packages("RCurl")
+install.packages("ggplot2")
+install.packages("reshape2")
 ```
 
 ### Installing HiCUP
@@ -149,35 +155,41 @@ conda install -c bioconda deeptools
 ```
 
 ## Usage (Command line options)
-Arima-Oncology-Pipeline-v0.1.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-P run_plot]
-              [-A bowtie2] [-X bowtie2_index_basename] [-d digest] [-H hicup_dir] [-C chicago_dir]
-              [-I FASTQ_string] [-o out_dir] [-p output_prefix] [-b BED] [-R RMAP] [-B BAITMAP]
-              [-D design_dir] [-O organism] [-r resolution] [-t threads] [-v] [-h]
+Arima-Oncology-Pipeline-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
+            [-P run_plot] [-C run_hicplot] [-a bowtie2] [-H hicup_dir] [-c chicago_dir]
+            [-x bowtie2_index_basename] [-d digest] [-s chrom_sizes_file] [-e cut_site_file]
+            [-I FASTQ_string] [-o out_dir] [-p output_prefix] [-O organism] [-b BED] [-R RMAP]
+            [-B BAITMAP] [-D design_dir] [-r resolution] [-w scan_window] [-g gene_list] [-t threads]
+            [-v] [-h]
 
-      * [-W run_hicup]: "1" (default) to run HiCUP pipeline, "0" to skip. If skipping,
-            HiCUP_summary_report_*.txt and *R1_2*.hicup.bam need to be in the HiCUP output folder.
-      * [-Y run_bam2chicago]: "1" (default) to run bam2chicago.sh, "0" to skip
-      * [-Z run_chicago]: "1" (default) to run CHiCAGO pipeline, "0" to skip
-      * [-P run_plot]: "1" (default) to generate plots, "0" to skip
-      * [-A bowtie2]: bowtie2 tool path
-      * [-X bowtie2_index_basename]: bowtie2 index file prefix
-      * [-d digest]: genome digest file produced by hicup_digester
-      * [-H hicup_dir]: directory of the HiCUP tool
-      * [-C chicago_dir]: directory of the CHiCAGO tool
-      * [-I FASTQ_string]: a pair of FASTQ files separated by "," (no space is allowed)
-      * [-o out_dir]: output directory
-      * [-p output_prefix]: output file prefix (filename only, not including the path)
-      * [-b BED]: the Arima capture probes design BED file for CHiCAGO
-      * [-R RMAP]: CHiCAGO's *.rmap file
-      * [-B BAITMAP]: CHiCAGO's *.baitmap file
-      * [-D design_dir]: directory containing CHiCAGO's design files
-            (exactly one of each: *.poe, *.npb, and *.nbpb)
-      * [-O organism]: organism must be one of "hg19", "hg38", "mm9", or "mm10"
-      * [-r resolution]: resolution of the loops called, must be one of
-            "1f", "1kb", "3kb", or "5kb"
-      * [-t threads]: number of threads to run HiCUP and CHiCAGO
-      * [-v]: print version number and exit
-      * [-h]: print this help and exit
+    * [-W run_hicup]: "1" (default) to run HiCUP pipeline, "0" to skip. If skipping,
+        HiCUP_summary_report_*.txt and *R1_2*.hicup.bam need to be in the HiCUP output folder.
+    * [-Y run_bam2chicago]: "1" (default) to run bam2chicago.sh, "0" to skip
+    * [-Z run_chicago]: "1" (default) to run CHiCAGO pipeline, "0" to skip
+    * [-G run_genomescan]: "1" (default) to run GenomeScan pipeline, "0" to skip
+    * [-P run_plot]: "1" (default) to generate plots, "0" to skip
+    * [-C run_hicplot]: "1" (default) to generate HiC heatmap, "0" to skip
+    * [-a bowtie2]: bowtie2 tool path
+    * [-H hicup_dir]: directory of the HiCUP tool
+    * [-c chicago_dir]: directory of the CHiCAGO tool
+    * [-x bowtie2_index_basename]: bowtie2 index file prefix
+    * [-d digest]: genome digest file produced by hicup_digester
+    * [-s chrom_sizes_file]: *.chrom.sizes file generated from the reference file needed by Juicer pipeline
+    * [-e cut_site_file]: cut site file needed by Juicer pipeline
+    * [-I FASTQ_string]: a pair of FASTQ files separated by "," (no space is allowed)
+    * [-o out_dir]: output directory
+    * [-p output_prefix]: output file prefix (filename only, not including the path)
+    * [-O organism]: organism must be one of "hg19", "hg38" (default), "mm9", or "mm10"
+    * [-b BED]: the Arima capture probes design BED file for CHiCAGO
+    * [-R RMAP]: CHiCAGO's *.rmap file
+    * [-B BAITMAP]: CHiCAGO's *.baitmap file
+    * [-D design_dir]: directory containing CHiCAGO's design files (exactly one of each: *.poe, *.npb, and *.nbpb)
+    * [-r resolution]: resolution of the loops called, must be one of "1f", "1kb", "3kb", or "5kb" (default)
+    * [-w scan_window]: sliding window size for GenomeScan in base pair. Default: 50000
+    * [-g gene_list]: gene list in the capture panel for GenomeScan
+    * [-t threads]: number of threads to run HiCUP and CHiCAGO
+    * [-v]: print version number and exit
+    * [-h]: print this help and exit
 
 ## Arima Specific outputs
 
@@ -220,12 +232,20 @@ These files can be viewed in the WashU EpiGenome Browser (http://epigenomegatewa
 #### [output_directory]/chicago/data/[output_prefix].heatmap.pdf
 - PDF of metaplot and heatmap of all mapped reads overlapping the probe regions used for loop calling. This file can be used to assess the signal to noise of the CHiC enrichment.
 
+### Arima GenomeScan module with SV Calls and Plots
+
+#### [output_directory]/genomescan/
+
+### Arima HiC heatmap for visualization using Juicebox
+
+#### [output_directory]/plots/[output_prefix]_inter_30.hic
+
 
 ## Test Dataset (hg38)
 
-25 and 100 million Illumina paired-end sequencing datasets and their pipeline output files (based on hg38) can be downloaded from:
+25 and 200 million Illumina paired-end sequencing datasets and their pipeline output files (based on hg38) can be downloaded from:
 
-ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Capture_HiC_Settings/test_data/
+ftp://ftp-arimagenomics.sdsc.edu/pub/Oncology/
 
 On the FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Capture_HiC_Settings/ ), there are 4 pre-computed design folders: hg38, hg19, mm10, and mm9. For each genome build, there are three folders named: 1kb, 3kb and 5kb, which correspond to 1kb, 3kb and 5kb resolutions respectively. We found that after the binning, 5kb resolution provides the best replicate reproducibility and sensitivity. For each resolution, there are 7 files: three pre-computed design files (*.npb, *.poe and *.nbpb), one *.rmap, one *.baitmap, one *.baitmap_4col.txt and one CHiCAGO setting file.
 
@@ -274,7 +294,7 @@ It also contains a reference folder, with one reference FASTA file (\*.fa), one 
 
 ## Arima Pipeline Version
 
-0.1
+0.2
 
 ## Support
 

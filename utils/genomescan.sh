@@ -1,7 +1,7 @@
 #!/bin/bash
 
 print_usage() {
-  printf "Usage: genomescan.sh -i [input.bam] [-g GENE_LIST.bed -w window_size -wf window_file -p prefix -o output_dir]\n";
+  printf "Usage: genomescan.sh -i [input.bam] [-g GENE_LIST.bed -w window_size -wf window_file -t threads -p prefix -o output_dir]\n";
 }
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
@@ -18,7 +18,8 @@ else
             "-i"|"--input"      ) INPUT_BAM="$1"; shift;;
             "-g"|"--genes"      ) GENE_LIST="$1"; shift;;
             "-w"|"--windowsize" ) WINDOW="$1"; shift;;
-            "-wf"|"--windowfile" ) WINDOW_FILE="$1"; shift;;
+            "-wf"|"--windowfile") WINDOW_FILE="$1"; shift;;
+            "-t"|"--threads"    ) THREADS="$1"; shift;;
             "-p"|"--prefix"     ) PREFIX="$1"; shift;;
             "-o"|"--out_dir"    ) OUT_DIR="$1"; shift;;
             "-c"|"--cleanup"    ) CLEANUP="$1"; shift;;
@@ -31,7 +32,7 @@ else
 : "${INPUT_BAM:?"No input file specified."}"
 echo "Using input file: "$INPUT_BAM""
 
-: "${GENE_LIST:=./Charon_genes_v1.4.srt.bed}"
+: "${GENE_LIST:?"No gene list file specified."}"
 echo "Gene regions to analyze from: "$GENE_LIST""
 
 #: "${WINDOW:="50000"}"
@@ -64,7 +65,7 @@ bamfilename="$(basename $INPUT_BAM)"
 
 # Check if sorted file exists, create it not
 INPUT_BAM_SRT=$OUT_DIR/$PREFIX/${bamfilename%.bam}.sortn.bam
-[ -f ${INPUT_BAM_SRT} ] || samtools sort $INPUT_BAM -o $INPUT_BAM_SRT
+[ -f ${INPUT_BAM_SRT} ] || samtools sort $INPUT_BAM -@ $THREADS -o $INPUT_BAM_SRT
 
 #check if .bai index file exists, create if not
 #[ -f ${INPUT_BAM}.bai ] || samtools index ${INPUT_BAM}
@@ -74,6 +75,9 @@ INPUT_BAM_SRT=$OUT_DIR/$PREFIX/${bamfilename%.bam}.sortn.bam
 IN_DIR=`echo $INPUT_BAM_SRT | awk '{gsub(/[^\/]*$/,"");print}'`
 [ -f ${IN_DIR}/${PREFIX}.bed ] || bedtools bamtobed -i $INPUT_BAM_SRT > ${IN_DIR}/${PREFIX}.bed
 
+# Added by Xiang to reduce memory usage in the grep step
+sed s@/[12]@@ ${IN_DIR}/${PREFIX}.bed > ${IN_DIR}/${PREFIX}.modified.bed
+
 #Create output directory tree
 mkdir -p $OUT_DIR/$PREFIX/
 mkdir -p $OUT_DIR/$PREFIX/tmp/
@@ -82,6 +86,7 @@ mkdir -p $OUT_DIR/$PREFIX/gene_results/${WINDOW}/all_genes/
 
 #Add directories for subsequent analysis
 mkdir -p $OUT_DIR/$PREFIX/significant_interactions/${WINDOW}/
+mkdir -p $OUT_DIR/$PREFIX/significant_interactions/${WINDOW}/chromosome_interactions/
 mkdir -p $OUT_DIR/$PREFIX/plots/${WINDOW}/
 mkdir -p $OUT_DIR/$PREFIX/plots/${WINDOW}/pdf/
 mkdir -p $OUT_DIR/$PREFIX/plots/${WINDOW}/png/
@@ -112,7 +117,10 @@ do
     # fi
 
     #Get read pairs from regions, save to .bed file for intersect
-    LC_ALL=C grep -w -F -f ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt < ${IN_DIR}/${PREFIX}.bed > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed
+    #LC_ALL=C grep -w -F -f ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt < ${IN_DIR}/${PREFIX}.bed > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed
+
+    # Added by Xiang to reduce memory usage
+    awk 'NR==FNR{ids[$0]; next} {if($4 in ids) print} f' ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt ${IN_DIR}/${PREFIX}.modified.bed > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed
 
     #Get counts of reads aligned to gene within each sliding window
     bedtools intersect -c -a $WINDOW_FILE -b ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed > ${OUT_DIR}/${PREFIX}/gene_results/${WINDOW}/all_genes/${gene}.${WINDOW}.bed

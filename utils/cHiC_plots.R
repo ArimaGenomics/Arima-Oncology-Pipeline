@@ -18,9 +18,9 @@ chrHeatPlot <- function(interchrCountMtrx, top_return = 5){
 #################################
 
 genomeManhattan <- function(cntMtrx, gene, pvals = NA, sig.cutoff=0.05, partner.gene = NA, plot.title = NA, calc.pval = FALSE, padj.method = "BH", plot.min = 1, sig.col = "violetred2", annot.col = "darkturquoise", pnt.col = "grey10"){
-	if(length(pvals) == 1 & calc.pval == TRUE){
-		pvals <- p.adjust(inter.pvals.gene(cntMtrx, gene), method = padj.method)
-	}
+#	if(length(pvals) == 1 & calc.pval == TRUE){
+#		pvals <- p.adjust(inter.pvals.gene(cntMtrx, gene), method = padj.method)
+#	}
 
 	plot.df <- cntMtrx[,c("chr", "abs.pos", gene)]
 	pvals <- pvals[plot.df[,gene] >= plot.min]				#Removes 0 count rows to reduce drawing time, help with log transforms.
@@ -60,11 +60,14 @@ genomeManhattan <- function(cntMtrx, gene, pvals = NA, sig.cutoff=0.05, partner.
 
 ########################################
 
-chrManhattan <- function(cntMtrx, gene, chromosome, pvals = NA, sig.cutoff=0.05, show.gene = NA, plot.min = 1, plot.title = NA, calc.pval = FALSE, padj.method = "BH", sig.col = "violetred2", annot.col = "darkturquoise", pnt.col = "grey10"){
+chrManhattan <- function(cntMtrx, gene, chromosome, distance, pvals = NA, sig.cutoff=0.05, show.gene = NA, plot.min = 1, plot.title = NA, calc.pval = FALSE, padj.method = "BH", sig.col = "violetred2", annot.col = "darkturquoise", pnt.col = "grey10"){
 
-	if(length(pvals) == 1 & calc.pval == TRUE){
-		pvals <- p.adjust(inter.pvals.gene(cntMtrx, gene), method = padj.method)
-	}
+	#if(length(pvals) == 1 & calc.pval == TRUE){
+	#	pvals <- p.adjust(inter.pvals.gene(cntMtrx, gene, FALSE, distance), method = padj.method)
+	#}
+
+	# Check what happens if we correct for the total number of genes in the panel
+#	sig.cutoff = sig.cutoff / 1404
 
 	plot.df <- cntMtrx[,c("chr", "chrStart", "chrEnd", gene)]
 	pvals <- pvals[plot.df$chr == chromosome & plot.df[,gene] >= plot.min]
@@ -72,14 +75,21 @@ chrManhattan <- function(cntMtrx, gene, chromosome, pvals = NA, sig.cutoff=0.05,
 	max.y = max(c(plot.df[,gene], sig.cutoff))
 	ylim = c(0.9, 1.5*max.y)
 
-	ggplot(plot.df, aes(x=chrStart, y=plot.df[,gene])) +
-	scale_x_continuous(name = chromosome, breaks = seq(from=0, to=chr_length$len[chr_length$chr == chromosome], by = 10^7), minor_breaks = NULL, limits = c(0, chr_length$len[chr_length$chr == chromosome]), expand = expansion(mult=0, add=0), position = "bottom") +
-	scale_y_log10(name = "Number of Reads", breaks = c(1, 10, 100, 1000, 10000), minor_breaks = NULL, limits = ylim, expand = expansion(mult=0, add=0)) +
-	labs(title = ifelse(is.na(plot.title), paste(gene, "interactions with", chromosome, sep = " "), plot.title)) +
+##	Added a line to check if the pvalues are read correctly
+	plot.df <- cbind(plot.df, pvals)
+	colnames(plot.df)[5] <- "pvalue"
+##
+	chr.plot <- ggplot(plot.df, aes(x=chrStart, y=plot.df[,gene])) +
+#	scale_x_continuous(name = chromosome, breaks = seq(from=0, to=chr_length$len[chr_length$chr == chromosome], by = 10^7), minor_breaks = NULL, limits = c(0, chr_length$len[chr_length$chr == chromosome]), expand = expansion(mult=0, add=0), position = "bottom") +
+	scale_x_continuous(name = chromosome, breaks = seq(from=0, to=chr_length$len[chr_length$chr == chromosome], by = 10^7), minor_breaks = NULL, limits = c(0, chr_length$len[chr_length$chr == chromosome]), position = "bottom") +
+	#scale_y_log10(name = "Number of Reads", breaks = c(1, 10, 100, 1000, 10000), minor_breaks = NULL, limits = ylim, expand = expansion(mult=0, add=0)) +
+	scale_y_log10(name = "Number of Reads", breaks = c(1, 10, 100, 1000, 10000), minor_breaks = NULL, limits = ylim) +
+	#labs(title = ifelse(is.na(plot.title), paste(gene, "interactions with", chromosome, sep = " "), plot.title)) +
 	theme(panel.background=element_rect(fill = "white", color = "black", size = 0.1), plot.title = element_text(size=8), axis.ticks.y = element_line(size=0), axis.ticks.x = element_line(size=0.1), axis.line = element_line(size=0), axis.text=element_text(size=7), axis.title=element_text(size=8), panel.grid.major=element_blank(), panel.grid.minor=element_blank()) +
-		geom_rect(aes(xmin= ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, 0, all_genes$chrStart[all_genes$gene==gene]), ymin=1.1*max.y, xmax= ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, 0, all_genes$chrEnd[all_genes$gene==gene]), ymax=1.4*max.y), fill = ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, rgb(1,1,1,0), annot.col)) +
-	geom_rect(aes(xmin= ifelse(is.na(show.gene), 0, all_genes$chrStart[all_genes$gene==show.gene]), ymin=1.1*max.y, xmax= ifelse(is.na(show.gene), 0, all_genes$chrEnd[all_genes$gene==show.gene]), ymax=1.4*max.y), fill = ifelse(is.na(show.gene), rgb(1,1,1,0), annot.col)) +
-	geom_point(col=ifelse(is.na(pvals), pnt.col, ifelse(pvals <= sig.cutoff, sig.col, pnt.col)), size = 0.2) +
+	geom_rect(aes(xmin=0, ymin=ylim[1],xmax= chr_length[chromosome,2], ymax=ylim[2]), fill = "white") +
+	#geom_rect(aes(xmin= ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, 0, all_genes$chrStart[all_genes$gene==gene]), ymin=1.1*max.y, xmax= ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, 0, all_genes$chrEnd[all_genes$gene==gene]), ymax=1.4*max.y), fill = ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, rgb(1,1,1,0), annot.col)) +
+	#geom_rect(aes(xmin= ifelse(is.na(show.gene), 0, all_genes$chrStart[all_genes$gene==show.gene]), ymin=1.1*max.y, xmax= ifelse(is.na(show.gene), 0, all_genes$chrEnd[all_genes$gene==show.gene]), ymax=1.4*max.y), fill = ifelse(is.na(show.gene), rgb(1,1,1,0), annot.col)) +
+	geom_point(col=ifelse(is.na(plot.df$pvalue), pnt.col, ifelse(plot.df$pvalue <= sig.cutoff, sig.col, pnt.col)), size = 0.2) +
 	annotate(geom = "text", label= ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, "", gene), x = ifelse(all_genes$chr[all_genes$gene==gene]!=chromosome, 0, all_genes$chrEnd[all_genes$gene== gene]+ 500000), y = 1.34*max.y, hjust = "left", vjust = "top", size = 2, color = annot.col) +
 	annotate(geom = "text", label= ifelse(is.na(show.gene), "", show.gene), x = ifelse(is.na(show.gene), 0, all_genes$chrStart[all_genes$gene== show.gene]- 500000), y = 1.34*max.y, hjust = "right", vjust = "top", size = 2, color = annot.col)
 }
