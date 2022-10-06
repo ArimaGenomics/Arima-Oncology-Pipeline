@@ -876,7 +876,7 @@ if [[ "$run_genomescan" -eq 1 ]]; then
     		# Check if file exists and has interactions
     		if [ -s "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" ]; then
     			# echo "File ${j}_${i}_interactions.bedpe exists and has interactions."
-    			cat "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" | bedtools sort | bedtools groupby -g 4,5,6 -c 1,2,3,1,8 -o distinct,min,max,count,min | awk '{ if ($7>=3) print }' | sort -k1,1 -k2,2n -k3,3n -g -k8 | awk '!a[$2] {a[$2] = $8} $8 == a[$2]' | sort -g -k8 | awk '{printf "%s", $1"\t"; printf "%.f", $2+($3-$2)/2 - 25000; printf "%s","\t"; printf "%.f", $2+($3-$2)/2 +25000; printf "%s","\t"$4"\t"; printf "%.f",$5+($6-$5)/2 - 25000; printf "%s","\t"; printf "%.f\n", $5+($6-$5)/2 +25000}' > "$chromosome_interactions_dir/${i}_${j}_breakpoints.bedpe"
+    			cat "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" | awk -v OFS='\t' '{ print $4"_"$5"_"$6, $2, $3, $7, $8, $9, $10}' | bedtools sort | bedtools merge -c 1,5 -o count,min | sed 's/_/\t/g' | awk  -v OFS='\t' '{ print $1, $2, $3, $1, $4, $5, $6, $7}' | awk '{ if ($7>=3) print }' | sort -k1,1 -k2,2n -k3,3n -g -k8 | awk '!a[$2] {a[$2] = $8} $8 == a[$2]' | sort -g -k8 | awk -v scan_window_half="$scan_window_half" '{printf "%s", $1"\t"; printf "%.f", $2+($3-$2)/2 - scan_window_half; printf "%s", "\t"; printf "%.f", $2+($3-$2)/2 + scan_window_half; printf "%s", "\t"$4"\t"; printf "%.f", $5+($6-$5)/2 - scan_window_half; printf "%s", "\t"; printf "%.f\n", $5+($6-$5)/2 + scan_window_half}' > "$chromosome_interactions_dir/${i}_${j}_breakpoints.bedpe"
     		fi
     	done
     done
