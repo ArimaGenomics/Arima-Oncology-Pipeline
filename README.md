@@ -240,6 +240,9 @@ These files can be viewed in the WashU EpiGenome Browser (http://epigenomegatewa
 
 #### [output_directory]/plots/[output_prefix]_inter_30.hic
 
+## Arima Oncology Pipeline Singularity Image file
+
+ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif
 
 ## Test Dataset (hg38)
 
