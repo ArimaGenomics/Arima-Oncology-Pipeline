@@ -795,9 +795,9 @@ if [[ "$run_genomescan" -eq 1 ]]; then
     # Create N directories for batch processing
     declare -a arrayDir
     for i in $(seq 1 $numberOfDirs); do
-    	newDir=$out_genomescan"/"$output_prefix"/gene_results/"$scan_window"/dir"$i
-    	arrayDir+=($newDir)
-    	[ -d "$newDir" ] || mkdir "$newDir"
+        newDir=$out_genomescan"/"$output_prefix"/gene_results/"$scan_window"/dir"$i
+        arrayDir+=($newDir)
+        [ -d "$newDir" ] || mkdir "$newDir"
     done
     echo "Created $numberOfDirs directories in $out_genomescan/$output_prefix/gene_results/$scan_window/"
 
@@ -812,7 +812,7 @@ if [[ "$run_genomescan" -eq 1 ]]; then
     echo -e "Calculate significant interaction events for $output_prefix\n"
     i=0
     for d in $out_genomescan"/"$output_prefix"/gene_results/"$scan_window"/dir"*/; do
-    	currentDir=$( basename "$d" )
+        currentDir=$( basename "$d" )
 
         echo "Processing inter-chromosomal SVs..."
         echo "Rscript $cwd/utils/significant_interactions.R $out_genomescan $currentDir $output_prefix $scan_window $padj_method $windows_genes $cwd/utils/ inter 0 &> $out_genomescan/$output_prefix/gene_results/$scan_window/$currentDir.log &"
@@ -856,29 +856,29 @@ if [[ "$run_genomescan" -eq 1 ]]; then
     # Create interaction files for each chromosome pair
     chromosome_interactions_dir="$out_genomescan/$output_prefix/significant_interactions/$scan_window/chromosome_interactions/"
     for i in ${chromosomes[@]}; do
-    	for j in ${chromosomes[@]}; do
-    		# If the file for chri_chrj or chrj_chri exists do not continue. The analysis is symmetrical.
-    		if [[ ! -f "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" && ! -f "$chromosome_interactions_dir/${j}_${i}_interactions.bedpe" ]]; then
-    			if [ $i != $j ]; then
-    				# echo "New chromosome combination ${i} and ${j} for SV analysis"
-    				grep -w "${i}" "$out_genomescan/$output_prefix/significant_interactions/$scan_window/all_significant_windows.bedpe" | grep -w "${j}" > "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe"
-    			else
-    				# echo "Chromosome $i intra-interactions"
-    				grep -w "${i}" "$out_genomescan/$output_prefix/significant_interactions/$scan_window/all_significant_windows_intra.bedpe" > "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe"
-    			fi
-    		fi
-    	done
+        for j in ${chromosomes[@]}; do
+            # If the file for chri_chrj or chrj_chri exists do not continue. The analysis is symmetrical.
+            if [[ ! -f "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" && ! -f "$chromosome_interactions_dir/${j}_${i}_interactions.bedpe" ]]; then
+                if [ $i != $j ]; then
+                    # echo "New chromosome combination ${i} and ${j} for SV analysis"
+                    grep -w "${i}" "$out_genomescan/$output_prefix/significant_interactions/$scan_window/all_significant_windows.bedpe" | grep -w "${j}" > "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe"
+                else
+                    # echo "Chromosome $i intra-interactions"
+                    grep -w "${i}" "$out_genomescan/$output_prefix/significant_interactions/$scan_window/all_significant_windows_intra.bedpe" > "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe"
+                fi
+            fi
+        done
     done
 
     for i in ${chromosomes[@]}; do
-    	for j in ${chromosomes[@]}; do
-    		# echo "Processing file ${i}_${j}_interactions.bedpe"
-    		# Check if file exists and has interactions
+        for j in ${chromosomes[@]}; do
+            # echo "Processing file ${i}_${j}_interactions.bedpe"
+            # Check if file exists and has interactions
             if [ -s "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" ]; then
-    			# echo "File ${j}_${i}_interactions.bedpe exists and has interactions."
+                # echo "File ${j}_${i}_interactions.bedpe exists and has interactions."
                 cat "$chromosome_interactions_dir/${i}_${j}_interactions.bedpe" | awk -v OFS='\t' '{ print $4"_"$5"_"$6, $2, $3, $7, $8, $9, $10, $1}' | bedtools sort | bedtools merge -c 1,5,6,7,8 -o count,min,distinct,distinct,distinct | sed 's/_/\t/g' | awk -v OFS='\t' '{ print $1, $2, $3, $10, $4, $5, $6, $7, $8, $9}' | awk '{ if($7>=3) print }' | sort -k1,1 -k2,2n -k3,3n -g -k8 | awk '!a[$2] {a[$2] = $8} $8 == a[$2]' | sort -g -k8 | awk -v scan_window_half="$scan_window_half" '{printf "%s", $1"\t"; printf "%.f", $2+($3-$2)/2 - scan_window_half; printf "%s", "\t"; printf "%.f", $2+($3-$2)/2 + scan_window_half; printf "%s", "\t"$4"\t"; printf "%.f", $5+($6-$5)/2 - scan_window_half; printf "%s", "\t"; printf "%.f", $5+($6-$5)/2 + scan_window_half; printf "%s", "\t"; printf "%s", $9"\t"; printf "%s\n", $10}' > "$chromosome_interactions_dir/${i}_${j}_breakpoints.bedpe"
-    		fi
-    	done
+            fi
+        done
     done
 
     # Merge all breakpoints into one file for all chromosomes
