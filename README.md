@@ -10,7 +10,16 @@ This pipeline is suited for CHiC from any protocol but optimal results are obtai
 
 To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimagenomics.com/
 
-### Installing Arima Oncology
+## <span style="color:red"> Important! </span>
+
+### We provide three ways to run Arima Oncology pipeline:
+- Using the Docker image (https://hub.docker.com/repository/docker/arimaxiang/arima_oncology)
+- Using the Singularity image (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif)
+- Install all the tools and dependencies by yourself
+
+### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
+
+### Installing Arima Oncology pipeline by yourself
 
 ```
 git clone https://github.com/ArimaGenomics/Arima-Oncology-Pipeline
@@ -187,7 +196,7 @@ Arima-Oncology-Pipeline-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chic
     * [-r resolution]: resolution of the loops called, must be one of "1f", "1kb", "3kb", or "5kb" (default)
     * [-w scan_window]: sliding window size for GenomeScan in base pair. Default: 50000
     * [-g gene_list]: gene list in the capture panel for GenomeScan
-    * [-t threads]: number of threads to run HiCUP and CHiCAGO
+    * [-t threads]: number of threads to run HiCUP, CHiCAGO, GenomeScan and/or Juicer
     * [-v]: print version number and exit
     * [-h]: print this help and exit
 
@@ -240,9 +249,6 @@ These files can be viewed in the WashU EpiGenome Browser (http://epigenomegatewa
 
 #### [output_directory]/plots/[output_prefix]_inter_30.hic
 
-## Arima Oncology Pipeline Singularity Image file
-
-ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif
 
 ## Test Dataset (hg38)
 
@@ -267,20 +273,20 @@ It also contains a reference folder, with one reference FASTA file (\*.fa), one 
 - These six files are are bowtie2 index files, generated using "bowtie2-build" script from Bowtie 2 pipeline.
 - Reference: http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer
 
-*hg38_chicago_input_5kb.rmap*
+*_5kb.rmap*
 - This is a tab-separated file of the format <chr> <start> <end> <numeric ID>, describing the restriction digest (or "virtual digest" if pooled fragments are used). These numeric IDs are referred to as "otherEndID" in CHiCAGO. All read fragments mapping outside of the digest coordinates will be disregarded.
 - The file can be created using "create_baitmap_rmap.pl" script from CHiCAGO pipeline (with some pre-processing using custom scripts).
 - Reference: https://bitbucket.org/chicagoTeam/chicago/src/master/chicagoTools/
 
-*hg38_chicago_input_5kb.baitmap*
+*_5kb.baitmap*
 - This is a tab-separated file of the format <chr> <start> <end> <numeric ID> <annotation>, listing the coordinates of the baited/captured restriction fragments (should be a subset of the fragments listed in *.rmap file), their numeric IDs (should match those listed in *.rmap file for the corresponding fragments) and their annotations (such as, for example, the names of baited promoters). The numeric IDs are referred to as "baitID" in CHiCAGO.
 - The file can be created using "create_baitmap_rmap.pl" script from CHiCAGO pipeline (with some pre-processing using custom scripts).
 - Reference: https://bitbucket.org/chicagoTeam/chicago/src/master/chicagoTools/
 
-*hg38_chicago_input_5kb.baitmap_4col.txt*
+*_5kb.baitmap_4col.txt*
 - This is the first 4 columns of the "hg38_chicago_input_5kb.baitmap" file.
 
-*GW_PCHIC_hg38_5kb.nbpb, GW_PCHIC_hg38_5kb.npb, GW_PCHIC_hg38_5kb.poe*
+*.nbpb, .npb, .poe*
 - These three files are called design files in CHiCAGO pipeline. They are ASCII files containing the following information:
 - NPerBin file (.npb): <baitID> <Total no. valid restriction fragments in distance bin 1> ... <Total no. valid restriction fragments in distance bin N>, where the bins map within the "proximal" distance range from each bait (0; maxLBrownEst] and bin size is defined by the binsize parameter.
 - NBaitsPerBin file (.nbpb): <otherEndID> <Total no. valid baits in distance bin 1> ... <Total no. valid baits in distance bin N>, where the bins map within the "proximal" distance range from each other end (0; maxLBrownEst] and bin size is defined by the binsize parameter.
