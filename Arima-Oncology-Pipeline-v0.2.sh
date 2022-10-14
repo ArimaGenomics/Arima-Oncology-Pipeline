@@ -4,7 +4,7 @@
 ###                       Computing Environment                          ###
 ############################################################################
 
-# Computing Resources: For shallow sequencing (5 - 20 million raw paired-end reads), the Arima Oncology pipeline (Arima-Oncology) requires at least 12 CPU cores with 48 GB RAM. The shallow sequencing analysis should complete in ~ 4 - 8 hours. For deep sequencing (200 – 600 million raw paired-end reads), we recommend 20 - 30 CPU cores with at least 80 - 120 GB RAM. Samples with 200 million raw paired-end reads will run for 1 - 2 days with the recommended computational resources. Additional resources can be added to decrease the analysis time.
+# Computing Resources: For shallow sequencing (5 - 20 million raw paired-end reads), the Arima Oncology pipeline (Arima-Oncology) requires at least 8 CPU cores with 32 GB RAM. The shallow sequencing analysis should complete in ~ 4 - 8 hours. For deep sequencing (100 - 200 million raw paired-end reads), we recommend 20 - 30 CPU cores with at least 80 - 120 GB RAM. Samples with 200 million raw paired-end reads will run for 1 - 2 days with the recommended computational resources. Additional resources can be added to decrease the analysis time.
 
 # Please install the following dependencies and add them to your PATH variable to ensure HiCUP and CHiCAGO will execute in your computing environment:
 # IMPORTANT NOTE: bedtools v2.26 or later isn't compatible with CHiCAGO! Please use v2.25 instead!!!
@@ -58,7 +58,7 @@ organism_Help="* [-O organism]: organism must be one of \"hg19\", \"hg38\" (defa
 BED_Help="* [-b BED]: the Arima capture probes design BED file for CHiCAGO"
 RMAP_Help="* [-R RMAP]: CHiCAGO's *.rmap file"
 BAITMAP_Help="* [-B BAITMAP]: CHiCAGO's *.baitmap file"
-design_dir_Help="* [-D design_dir]: directory containing CHiCAGO's design files (exactly one of each: *.poe, *.npb, and *.nbpb)"
+design_dir_Help="* [-D design_dir]: directory containing CHiCAGO's design files (exactly one of each: *.rmap, *.baitmap, *.poe, *.npb, and *.nbpb)"
 #minFragLen_Help="* [-m minFragLen]: minFragLen and maxFragLen correspond to the limits within
 #    which we observed no clear dependence between fragment length and the numbers
 #    of reads mapping to these fragments in CHiC data"
@@ -77,7 +77,7 @@ resolution_Help="* [-r resolution]: resolution of the loops called, must be one 
 #    still observable. Default: 1500000"
 scan_window_Help="* [-w scan_window]: sliding window size for GenomeScan in base pair. Default: 50000"
 gene_list_Help="* [-g gene_list]: gene list in the capture panel for GenomeScan"
-threads_Help="* [-t threads]: number of threads to run HiCUP and CHiCAGO"
+threads_Help="* [-t threads]: number of threads to run HiCUP, CHiCAGO, GenomeScan and/or Juicer"
 version_Help="* [-v]: print version number and exit"
 help_Help="* [-h]: print this help and exit"
 
@@ -145,7 +145,7 @@ maxLBrownEst=2000000 # Default: 1500000, except for 5kb resolution. The distance
 scan_window=50000 # Sliding window size for GenomeScan in base pair.
 gene_list=$cwd"/utils/oncopanel_genes_v1.4.srt.bed" # Gene list in the capture panel for GenomeScan. Use -g to overwrite.
 padj_method="BH" # P-value adjustment method for GenomeScan. Default: "BH" (Benjamini-Hochberg)
-threads=12 # Number of threads to run HiCUP, CHiCAGO and/or Juicer.
+threads=12 # Number of threads to run HiCUP, CHiCAGO, GenomeScan and/or Juicer.
 
 #if [ $organism == "hg19" ]; then
 #  BED="GW_PC_S3207364_S3207414_hg19.uniq.bed"
@@ -206,6 +206,13 @@ done
 command -v Rscript &> /dev/null
 if [[ $? -ne 0 ]]; then
     echo "Could not find R. Please install or include it into the \"PATH\" variable!"
+    printHelpAndExit 1
+fi
+
+#hash python &> /dev/null
+command -v python &> /dev/null
+if [[ $? -ne 0 ]]; then
+    echo "Could not find python. Please install or include it into the \"PATH\" variable!"
     printHelpAndExit 1
 fi
 
@@ -387,8 +394,8 @@ fi
 if [ ! -d "$design_dir" ]; then
     echo "Please provide the correct folder containing design files for CHiCAGO (-D)!"
     printHelpAndExit 1
-elif ! [[ `ls $design_dir/*.poe 2> /dev/null | wc -l` -eq 1 && `ls $design_dir/*.npb 2> /dev/null | wc -l` -eq 1 && `ls $design_dir/*.nbpb 2> /dev/null | wc -l` -eq 1 ]]; then
-    echo "Please provide exactly one of each: *.poe, *.npb and *.nbpb in the design folder (-D)"
+elif ! [[ `ls $design_dir/*.rmap 2> /dev/null | wc -l` -eq 1 && `ls $design_dir/*.baitmap 2> /dev/null | wc -l` -eq 1 && `ls $design_dir/*.poe 2> /dev/null | wc -l` -eq 1 && `ls $design_dir/*.npb 2> /dev/null | wc -l` -eq 1 && `ls $design_dir/*.nbpb 2> /dev/null | wc -l` -eq 1 ]]; then
+    echo "Please provide exactly one of each: *.rmap, *.baitmap, *.poe, *.npb and *.nbpb in the design folder (-D)"
     printHelpAndExit 1
 fi
 
@@ -532,6 +539,7 @@ if [[ "$run_hicplot" == 1 ]]; then
     echo perl=`which perl`
 fi
 echo Rscript=`which Rscript`
+echo python=`which python`
 echo samtools=`which samtools`
 echo bedtools=`which bedtools`
 echo deeptools=`which deeptools`
@@ -971,7 +979,7 @@ off_target=$(( $ALL - $on_target ))
 # lcis_on_target_p=`echo "scale=4; 100 * $lcis_on_target / $intra_ge_15kb_pairs" | bc | awk '{ printf("%.1f", $0) }'`
 
 # Estimated, needs to be updated
-target_raw_pairs="100000000"
+target_raw_pairs="NA"
 
 timestamp=`date '+%Y/%m/%d %H:%M:%S'`
 echo -e "Finished calculating on-target rate. [$timestamp]\n"
