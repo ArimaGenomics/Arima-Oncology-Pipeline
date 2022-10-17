@@ -2,22 +2,47 @@
 
 # Arima Oncology Pipeline using Arima-HiC<sup>+</sup> Kit
 
-This pipeline is for analyzing capture HiC data with HiCUP and CHiCAGO pipelines for generating Arima Genomics QC metrics and output data files. The pipeline runs the standard HiCUP and CHiCAGO algorithms from https://www.bioinformatics.babraham.ac.uk/projects/hicup/ and https://bioconductor.org/packages/release/bioc/html/Chicago.html with some minor changes to the default parameters. These parameters have been optimized by internal benchmarking and have been found to optimize sensitivity and specificity. This pipeline will also generate shallow and deep sequencing QC metrics which can be copied into the Arima QC Worksheet for analysis. Additionally, the pipeline automatically generates metaplots for data QC and arc plots of chromatin loops for data visualization.
-
-## Getting Started
+This pipeline is for analyzing capture HiC data with HiCUP and CHiCAGO pipelines for generating Arima Genomics QC metrics and output data files. The pipeline runs the standard HiCUP and CHiCAGO algorithms from https://www.bioinformatics.babraham.ac.uk/projects/hicup/ and https://bioconductor.org/packages/release/bioc/html/Chicago.html with some minor changes to the default parameters. These parameters have been optimized by internal benchmarking and have been found to optimize sensitivity and specificity. It also runs the GenomeScan algorithm developed in house. This pipeline will generate shallow and deep sequencing QC metrics which can be copied into the Arima QC Worksheet for analysis. Additionally, the pipeline automatically generates metaplots for data QC and arc plots of chromatin loops for data visualization.
 
 This pipeline is suited for CHiC from any protocol but optimal results are obtained when using the Arima-HiC<sup>+</sup> kit with the Arima-CHiC protocol.
 
 To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimagenomics.com/
 
+## Getting Started
+
 ## <span style="color:red"> Important! </span>
 
 ### We provide three ways to run Arima Oncology pipeline:
 - Using the Docker image (https://hub.docker.com/repository/docker/arimaxiang/arima_oncology)
-- Using the Singularity image (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif)
+- Using the Singularity image with the wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif)
 - Install all the tools and dependencies by yourself
 
-### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
+#### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies. Additionally, a wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
+
+### Using the Singularity image with the wrapper script
+
+#### Just download the *.sif file with the corresponding wrapper script. Put them in the same directory and run the command below:
+bash run_Arima-Oncology-Pipeline-singularity-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
+                 [-P run_plot] [-C run_hicplot] [-I FASTQ_string] [-w scan_window] [-o out_dir] [-p output_prefix] [-t threads]
+
+```
+Required options:
+    * [-I FASTQ_string]: a pair of FASTQ files separated by "," (no space is allowed)
+    * [-o out_dir]     : output directory
+
+Optional options:
+    * [-W run_hicup]      : "1" (default) to run HiCUP pipeline, "0" to skip. If skipping, HiCUP_summary_report_*.txt and *R1_2*.hicup.bam need to be in the HiCUP output folder.
+    * [-Y run_bam2chicago]: "1" (default) to run bam2chicago.sh, "0" to skip
+    * [-Z run_chicago]    : "1" (default) to run CHiCAGO pipeline, "0" to skip
+    * [-G run_genomescan] : "1" (default) to run GenomeScan pipeline, "0" to skip
+    * [-P run_plot]       : "1" (default) to generate plots, "0" to skip
+    * [-C run_hicplot]    : "1" (default) to generate HiC heatmap, "0" to skip
+    * [-p output_prefix]  : output file prefix (filename only, not including the path)
+    * [-w scan_window]    : sliding window size for GenomeScan in base pair. Default: 50000
+    * [-t threads]        : number of threads to run HiCUP, CHiCAGO, GenomeScan and/or Juicer. Default: 16
+    * [-h]                : print this help and exit
+```
+
 
 ### Installing Arima Oncology pipeline by yourself
 
