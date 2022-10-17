@@ -17,7 +17,8 @@ To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimageno
 - Using the Singularity image with the wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif)
 - Install all the tools and dependencies by yourself
 
-#### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies. Additionally, a wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
+#### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
+#### Additionally, a wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
 
 ### Using the Singularity image with the wrapper script
 
@@ -189,7 +190,7 @@ conda install -c bioconda deeptools
 ```
 
 ## Usage (Command line options)
-Arima-Oncology-Pipeline-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
+bash Arima-Oncology-Pipeline-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
             [-P run_plot] [-C run_hicplot] [-a bowtie2] [-H hicup_dir] [-c chicago_dir]
             [-x bowtie2_index_basename] [-d digest] [-s chrom_sizes_file] [-e cut_site_file]
             [-I FASTQ_string] [-o out_dir] [-p output_prefix] [-O organism] [-b BED] [-R RMAP]
