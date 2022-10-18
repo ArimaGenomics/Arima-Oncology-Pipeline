@@ -18,7 +18,7 @@ To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimageno
 - Install all the tools and dependencies by yourself
 
 #### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
-#### Additionally, a wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
+#### Additionally, a wrapper script (run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided in this repository for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
 
 ### Using the Singularity image with the wrapper script
 
