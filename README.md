@@ -282,9 +282,12 @@ These files can be viewed in the WashU EpiGenome Browser (http://epigenomegatewa
 
 ftp://ftp-arimagenomics.sdsc.edu/pub/Oncology/
 
-On the FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Capture_HiC_Settings/ ), there are 4 pre-computed design folders: hg38, hg19, mm10, and mm9. For each genome build, there are three folders named: 1kb, 3kb and 5kb, which correspond to 1kb, 3kb and 5kb resolutions respectively. We found that after the binning, 5kb resolution provides the best replicate reproducibility and sensitivity. For each resolution, there are 7 files: three pre-computed design files (*.npb, *.poe and *.nbpb), one *.rmap, one *.baitmap, one *.baitmap_4col.txt and one CHiCAGO setting file.
+On the FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/test_data/design/5kb_2Mb/ ), there are six pre-computed design files for hg38 at 5kb resolution. We found that after the binning, 5kb resolution provides the best replicate reproducibility and sensitivity. This folder contains three pre-computed design files (*.npb, *.poe and *.nbpb), one *.rmap, one *.baitmap, and one *.baitmap_4col.txt file.
 
-It also contains a reference folder, with one reference FASTA file (\*.fa), one HiCUP digest file for Arima's dual-enzyme chemistry and six bowtie2 index files (\*.bt2) in it.
+The hg38 reference files can also be found at our FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Capture_HiC_Settings/hg38/reference/ ), with one reference FASTA file (\*.fa), one HiCUP digest file for Arima's dual-enzyme chemistry and six bowtie2 index files (\*.bt2) in it.
+
+If you would like to run the pipeline with "-C 1" (generate HiC heatmap), these two files are also required: ftp://ftp-arimagenomics.sdsc.edu/pub/Arima_FFPE/Juicer/hg38.chrom.sizes and ftp://ftp-arimagenomics.sdsc.edu/pub/Arima_FFPE/Juicer/hg38_GATC_GANTC.txt.
+
 
 **Here is a detailed description of each file on our FTP.**
 
@@ -299,18 +302,18 @@ It also contains a reference folder, with one reference FASTA file (\*.fa), one 
 - These six files are are bowtie2 index files, generated using "bowtie2-build" script from Bowtie 2 pipeline.
 - Reference: http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#the-bowtie2-build-indexer
 
-*_5kb.rmap*
+*.rmap*
 - This is a tab-separated file of the format <chr> <start> <end> <numeric ID>, describing the restriction digest (or "virtual digest" if pooled fragments are used). These numeric IDs are referred to as "otherEndID" in CHiCAGO. All read fragments mapping outside of the digest coordinates will be disregarded.
 - The file can be created using "create_baitmap_rmap.pl" script from CHiCAGO pipeline (with some pre-processing using custom scripts).
 - Reference: https://bitbucket.org/chicagoTeam/chicago/src/master/chicagoTools/
 
-*_5kb.baitmap*
+*.baitmap*
 - This is a tab-separated file of the format <chr> <start> <end> <numeric ID> <annotation>, listing the coordinates of the baited/captured restriction fragments (should be a subset of the fragments listed in *.rmap file), their numeric IDs (should match those listed in *.rmap file for the corresponding fragments) and their annotations (such as, for example, the names of baited promoters). The numeric IDs are referred to as "baitID" in CHiCAGO.
 - The file can be created using "create_baitmap_rmap.pl" script from CHiCAGO pipeline (with some pre-processing using custom scripts).
 - Reference: https://bitbucket.org/chicagoTeam/chicago/src/master/chicagoTools/
 
-*_5kb.baitmap_4col.txt*
-- This is the first 4 columns of the "hg38_chicago_input_5kb.baitmap" file.
+*.baitmap_4col.txt*
+- This is the first 4 columns of the ".baitmap" file.
 
 *.nbpb, .npb, .poe*
 - These three files are called design files in CHiCAGO pipeline. They are ASCII files containing the following information:
