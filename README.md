@@ -2,9 +2,9 @@
 
 # Arima Oncology Pipeline using Arima-HiC<sup>+</sup> Kit
 
-This pipeline is for analyzing capture HiC data with HiCUP and CHiCAGO pipelines for generating Arima Genomics QC metrics and output data files. The pipeline runs the standard HiCUP and CHiCAGO algorithms from https://www.bioinformatics.babraham.ac.uk/projects/hicup/ and https://bioconductor.org/packages/release/bioc/html/Chicago.html with some minor changes to the default parameters. These parameters have been optimized by internal benchmarking and have been found to optimize sensitivity and specificity. It also runs the GenomeScan algorithm developed in house. This pipeline will generate shallow and deep sequencing QC metrics which can be copied into the Arima QC Worksheet for analysis. Additionally, the pipeline automatically generates metaplots for data QC and arc plots of chromatin loops for data visualization.
+This pipeline is for analyzing capture HiC data with HiCUP and CHiCAGO pipelines for generating Arima Genomics QC metrics and output data files. The pipeline runs the standard HiCUP, CHiCAGO and Juicer "pre" tools from https://www.bioinformatics.babraham.ac.uk/projects/hicup/, https://bioconductor.org/packages/release/bioc/html/Chicago.html and https://github.com/aidenlab/juicer/wiki/Pre with some minor changes to the default parameters. These parameters have been optimized by internal benchmarking and have been found to optimize sensitivity and specificity. It also runs the GenomeScan algorithm developed in house for inter- and intra-chromosomal Structural Variation (SV) detection from Capture HiC data. This pipeline will generate shallow and deep sequencing QC metrics which can be copied into the Arima QC Worksheet for analysis. Additionally, the pipeline automatically generates metaplots for data QC and arc plots of chromatin loops for data visualization.
 
-This pipeline is suited for CHiC from any protocol but optimal results are obtained when using the Arima-HiC<sup>+</sup> kit with the Arima-CHiC protocol.
+This pipeline is suited for Capture HiC from any protocol but optimal results are obtained when using the Arima-HiC<sup>+</sup> kit with the Arima-CHiC protocol.
 
 To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimagenomics.com/
 
@@ -12,18 +12,21 @@ To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimageno
 
 ## <span style="color:red"> Important! </span>
 
-### We provide three ways to run Arima Oncology pipeline:
-- Using the Docker image (https://hub.docker.com/repository/docker/arimaxiang/arima_oncology)
-- Using the Singularity image with the wrapper script (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif)
-- Install all the tools and dependencies by yourself
+### Although you can install all the tools and dependencies yourself, we strongly recommend using our pre-built Singularity image to run Arima Oncology pipeline!
 
-#### We provide Docker and Singularity containers that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
+#### We provide Docker (https://hub.docker.com/repository/docker/arimaxiang/arima_oncology) and Singularity containers (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif) that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
 #### Additionally, a wrapper script (run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided in this repository for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
 
-### Using the Singularity image with the wrapper script
+## Using the Singularity image with the wrapper script
 
-#### Just download the *.sif file with the corresponding wrapper script. Put them in the same directory and run the command below:
-bash run_Arima-Oncology-Pipeline-singularity-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
+#### Just download the *.sif file with the corresponding wrapper script.
+```
+wget ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif
+wget https://raw.githubusercontent.com/ArimaGenomics/Arima-Oncology-Pipeline/main/run_Arima-Oncology-Pipeline-singularity-v0.2.sh
+```
+
+#### Put them in the same directory and run the command below:
+> bash run_Arima-Oncology-Pipeline-singularity-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
                  [-P run_plot] [-C run_hicplot] [-I FASTQ_string] [-w scan_window] [-o out_dir] [-p output_prefix] [-t threads]
 
 ```
@@ -45,188 +48,7 @@ Optional options:
 ```
 
 
-### Installing Arima Oncology pipeline by yourself
-
-```
-git clone https://github.com/ArimaGenomics/Arima-Oncology-Pipeline
-cd Arima-Oncology-Pipeline
-chmod 755 Arima-Oncology-Pipeline-v0.2.sh
-cd utils
-tar xf chicagoTools.tar.gz
-```
-
-### Installing Python 3.4 or later
-
-- Anaconda3, https://docs.anaconda.com/anaconda/install/linux/
-
-```
-curl -O https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh
-sh Anaconda3-2019.07-Linux-x86_64.sh
-# read the user agreement and answer yes. install Anaconda3 in the default location which is your home folder.
-```
-
-### Installing R 3.4.3 or later
-
-```
-conda install R
-```
-
-- argparser (0.7.1), https://cran.r-project.org/web/packages/argparser/index.html
-
-```
-# in R
-install.packages("argparser")
-install.packages("argparse")
-install.packages("data.table")
-install.packages("RCurl")
-install.packages("ggplot2")
-install.packages("reshape2")
-```
-
-### Installing HiCUP
-
-Refer to the documentation at: https://www.bioinformatics.babraham.ac.uk/projects/hicup/read_the_docs/html/index.html for help installing HiCUP and its dependencies (Perl, R, bowtie2, and samtools).
-
-```
-wget https://github.com/StevenWingett/HiCUP/archive/refs/tags/v0.8.0.tar.gz
-tar -xzf v0.8.0.tar.gz
-```
-
-### Installing CHiCAGO
-
-Refer to the documentation at: https://bioconductor.org/packages/release/bioc/html/Chicago.html for help installing CHiCAGO and its dependencies.
-#### *IMPORTANT NOTE: bedtools v2.26 or later isn't compatible with CHiCAGO! Please use v2.25 instead!!!*
-
-```
-# in R
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("Chicago")
-BiocManager::install("Rsamtools")
-```
-
-### Other
-
-Before installing HTSLIB, gcc and zlib are required. Before installing bedtools, g++ is required. Skip if you already have those compilers installed.
-- gcc, https://gcc.gnu.org/
-
-```
-conda install -c conda-forge gcc_linux-64
-```
-
-- g++, https://gcc.gnu.org/
-
-```
-apt install g++
-```
-
-- libz, https://zlib.net/
-
-```
-apt install libz-dev
-```
-
-- bowtie2, https://github.com/BenLangmead/bowtie2
-
-```
-apt install bowtie2
-```
-
-- HTSLIB 1.10.2, http://www.htslib.org/download/
-
-```
-wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2
-tar -xjf htslib-1.10.2.tar.bz2
-cd htslib-1.10.2/
-./configure --prefix=/where/to/install
-make
-make install
-export PATH=/where/to/install/bin:$PATH
-```
-
-- samtools (v1.10), http://www.htslib.org/download/
-
-```
-wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
-tar -xjf samtools-1.10.tar.bz2
-cd samtools-1.10/
-./configure --prefix=/where/to/install
-make
-make install
-export PATH=/where/to/install/bin:$PATH
-```
-
-- bedtools (v2.25), https://github.com/arq5x/bedtools2/releases/tag/v2.25.0
-
-  ***IMPORTANT NOTE: bedtools v2.26 or later isn't compatible with CHiCAGO! Please use v2.25 instead!!!***
-
-```
-wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz
-tar -xzf bedtools-2.25.0.tar.gz
-mv bedtools2 bedtools-2.25.0
-cd bedtools-2.25.0
-make
-make install
-export PATH=/where/to/install/bin:$PATH
-```
-
-- bcftools (v1.10.2), http://www.htslib.org/download/
-
-```
-wget https://github.com/samtools/bcftools/releases/download/1.10.2/bcftools-1.10.2.tar.bz2
-tar -xjf bcftools-1.10.2.tar.bz2
-cd bcftools-1.10.2
-./configure --prefix=/where/to/install
-make
-make install
-export PATH=/where/to/install/bin:$PATH
-```
-
-- deeptools, https://deeptools.readthedocs.io/en/develop/content/installation.html
-
-```
-conda install -c bioconda deeptools
-```
-
-## Usage (Command line options)
-bash Arima-Oncology-Pipeline-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
-            [-P run_plot] [-C run_hicplot] [-a bowtie2] [-H hicup_dir] [-c chicago_dir]
-            [-x bowtie2_index_basename] [-d digest] [-s chrom_sizes_file] [-e cut_site_file]
-            [-I FASTQ_string] [-o out_dir] [-p output_prefix] [-O organism] [-b BED] [-R RMAP]
-            [-B BAITMAP] [-D design_dir] [-r resolution] [-w scan_window] [-g gene_list] [-t threads]
-            [-v] [-h]
-
-    * [-W run_hicup]: "1" (default) to run HiCUP pipeline, "0" to skip. If skipping,
-        HiCUP_summary_report_*.txt and *R1_2*.hicup.bam need to be in the HiCUP output folder.
-    * [-Y run_bam2chicago]: "1" (default) to run bam2chicago.sh, "0" to skip
-    * [-Z run_chicago]: "1" (default) to run CHiCAGO pipeline, "0" to skip
-    * [-G run_genomescan]: "1" (default) to run GenomeScan pipeline, "0" to skip
-    * [-P run_plot]: "1" (default) to generate plots, "0" to skip
-    * [-C run_hicplot]: "1" (default) to generate HiC heatmap, "0" to skip
-    * [-a bowtie2]: bowtie2 tool path
-    * [-H hicup_dir]: directory of the HiCUP tool
-    * [-c chicago_dir]: directory of the CHiCAGO tool
-    * [-x bowtie2_index_basename]: bowtie2 index file prefix
-    * [-d digest]: genome digest file produced by hicup_digester
-    * [-s chrom_sizes_file]: *.chrom.sizes file generated from the reference file needed by Juicer pipeline
-    * [-e cut_site_file]: cut site file needed by Juicer pipeline
-    * [-I FASTQ_string]: a pair of FASTQ files separated by "," (no space is allowed)
-    * [-o out_dir]: output directory
-    * [-p output_prefix]: output file prefix (filename only, not including the path)
-    * [-O organism]: organism must be one of "hg19", "hg38" (default), "mm9", or "mm10"
-    * [-b BED]: the Arima capture probes design BED file for CHiCAGO
-    * [-R RMAP]: CHiCAGO's *.rmap file
-    * [-B BAITMAP]: CHiCAGO's *.baitmap file
-    * [-D design_dir]: directory containing CHiCAGO's design files (exactly one of each: *.poe, *.npb, and *.nbpb)
-    * [-r resolution]: resolution of the loops called, must be one of "1f", "1kb", "3kb", or "5kb" (default)
-    * [-w scan_window]: sliding window size for GenomeScan in base pair. Default: 50000
-    * [-g gene_list]: gene list in the capture panel for GenomeScan
-    * [-t threads]: number of threads to run HiCUP, CHiCAGO, GenomeScan and/or Juicer
-    * [-v]: print version number and exit
-    * [-h]: print this help and exit
-
-## Arima Specific outputs
+## Arima Specific Outputs
 
 ### Arima Shallow Sequencing QC
 
@@ -282,9 +104,14 @@ These files can be viewed in the WashU EpiGenome Browser (http://epigenomegatewa
 
 ftp://ftp-arimagenomics.sdsc.edu/pub/Oncology/
 
+
+## Further Reading for Advanced Users
+
+***All the files mentioned in this section are already incorporated into the Docker and Singularity containers!***
+
 On the FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/test_data/design/5kb_2Mb/ ), there are six pre-computed design files for hg38 at 5kb resolution. We found that after the binning, 5kb resolution provides the best replicate reproducibility and sensitivity. This folder contains three pre-computed design files (*.npb, *.poe and *.nbpb), one *.rmap, one *.baitmap, and one *.baitmap_4col.txt file.
 
-The hg38 reference files can also be found at our FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Capture_HiC_Settings/hg38/reference/ ), with one reference FASTA file (\*.fa), one HiCUP digest file for Arima's dual-enzyme chemistry and six bowtie2 index files (\*.bt2) in it.
+The hg38 reference files can also be found on our FTP ( ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Capture_HiC_Settings/hg38/reference/ ), with one reference FASTA file (\*.fa), one HiCUP digest file for Arima's dual-enzyme chemistry and six bowtie2 index files (\*.bt2) in it.
 
 If you would like to run the pipeline with "-C 1" (generate HiC heatmap), these two files are also required: ftp://ftp-arimagenomics.sdsc.edu/pub/Arima_FFPE/Juicer/hg38.chrom.sizes and ftp://ftp-arimagenomics.sdsc.edu/pub/Arima_FFPE/Juicer/hg38_GATC_GANTC.txt.
 
@@ -345,4 +172,8 @@ For Arima customer support, please contact techsupport@arimagenomics.com
 
 #### Authors of CHiCAGO: https://bioconductor.org/packages/release/bioc/html/Chicago.html
 
-- Cairns J, Freire-Pritchett P, Wingett SW, Dimond A, Plagnol V, Zerbino D, Schoenfelder S, Javierre B, Osborne C, Fraser P, Spivakov M (2016). “CHiCAGO: Robust Detection of DNA Looping Interactions in Capture Hi-C data.” Genome Biology, 17, 127.
+- Cairns J, Freire-Pritchett P, Wingett SW, Dimond A, Plagnol V, Zerbino D, Schoenfelder S, Javierre B, Osborne C, Fraser P, Spivakov M (2016). "CHiCAGO: Robust Detection of DNA Looping Interactions in Capture Hi-C data." Genome Biology, 17, 127.
+
+#### Authors of Juicer "Pre": https://github.com/aidenlab/juicer/wiki/Pre
+
+- Neva C. Durand, Muhammad S. Shamim, Ido Machol, Suhas S. P. Rao, Miriam H. Huntley, Eric S. Lander, and Erez Lieberman Aiden. "Juicer provides a one-click system for analyzing loop-resolution Hi-C experiments." Cell Systems 3(1), 2016.
