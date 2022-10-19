@@ -25,7 +25,7 @@ wget ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology
 wget https://raw.githubusercontent.com/ArimaGenomics/Arima-Oncology-Pipeline/main/run_Arima-Oncology-Pipeline-singularity-v0.2.sh
 ```
 
-#### Put them in the same directory and run the command below:
+#### Put them in the same directory and run the command below.
 > bash run_Arima-Oncology-Pipeline-singularity-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
                  [-P run_plot] [-C run_hicplot] [-I FASTQ_string] [-w scan_window] [-o out_dir] [-p output_prefix] [-t threads]
 
