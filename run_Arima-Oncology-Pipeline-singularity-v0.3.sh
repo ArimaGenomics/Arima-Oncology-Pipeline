@@ -105,9 +105,9 @@ cwd=$(dirname $0)
 echo "Job is running in the Singularity container ..."
 echo "Output: $out_dir"
 
-singularity exec -B $FASTQ_dir:/Oncology/INPUT/ -B $out_dir:/Oncology/OUTPUT/ $cwd/Arima-Oncology-Pipeline-singularity-v0.2.sif bash /Oncology/Arima-Oncology-Pipeline-v0.2.sh -W $run_hicup -Y $run_bam2chicago -Z $run_chicago -G $run_genomescan -P $run_plot -C $run_hicplot -a /usr/bin/bowtie2 -H /HiCUP-0.8.0/ -c /chicagoTools/ -x /Oncology/reference_files/hg38 -d /Oncology/reference_files/Digest_hg38_Arima.txt -s /Oncology/reference_files/hg38.chrom.sizes -e /Oncology/reference_files/hg38_GATC_GANTC.txt -O hg38 -b /Oncology/utils/oncopanel_probes_v1.4.srt.bed -R /Oncology/Arima_files/design/5kb_2Mb/oncopanel_probes_v1.4_hg38_5kb.rmap -B /Oncology/Arima_files/design/5kb_2Mb/oncopanel_probes_v1.4_hg38_5kb.baitmap -D /Oncology/Arima_files/design/5kb_2Mb/ -w $scan_window -g /Oncology/utils/oncopanel_genes_v1.4.srt.bed -t $threads -I /Oncology/INPUT/$R1_basename,/Oncology/INPUT/$R2_basename -o /Oncology/OUTPUT/ -p $output_prefix
+singularity exec -B $FASTQ_dir:/Oncology/INPUT/ -B $out_dir:/Oncology/OUTPUT/ $cwd/Arima-Oncology-Pipeline-singularity-v0.3.sif bash /Oncology/Arima-Oncology-Pipeline-v0.3.sh -W $run_hicup -Y $run_bam2chicago -Z $run_chicago -G $run_genomescan -P $run_plot -C $run_hicplot -a /usr/bin/bowtie2 -H /HiCUP-0.8.0/ -c /chicagoTools/ -x /Oncology/reference_files/hg38 -d /Oncology/reference_files/Digest_hg38_Arima.txt -s /Oncology/reference_files/hg38.chrom.sizes -e /Oncology/reference_files/hg38_GATC_GANTC.txt -O hg38 -b /Oncology/utils/oncopanel_probes_v1.4.srt.bed -R /Oncology/Arima_files/design/5kb_2Mb/oncopanel_probes_v1.4_hg38_5kb.rmap -B /Oncology/Arima_files/design/5kb_2Mb/oncopanel_probes_v1.4_hg38_5kb.baitmap -D /Oncology/Arima_files/design/5kb_2Mb/ -w $scan_window -g /Oncology/utils/oncopanel_genes_v1.4.srt.bed -t $threads -I /Oncology/INPUT/$R1_basename,/Oncology/INPUT/$R2_basename -o /Oncology/OUTPUT/ -p $output_prefix
 
 echo "Job was finished!"
 
 # Example command using default arguments:
-# bash run_Arima-Oncology-Pipeline-singularity-v0.2.sh -I FASTQ_R1.fastq,FASTQ_R2.fastq -o OUT_DIR
+# bash run_Arima-Oncology-Pipeline-singularity-v0.3.sh -I FASTQ_R1.fastq,FASTQ_R2.fastq -o OUT_DIR
