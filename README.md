@@ -14,19 +14,19 @@ To order Arima-HiC<sup>+</sup> kits, please visit our website: https://arimageno
 
 ### Although you can install all the tools and dependencies yourself, we strongly recommend using our pre-built Singularity image to run Arima Oncology pipeline!
 
-#### We provide Docker (https://hub.docker.com/repository/docker/arimaxiang/arima_oncology) and Singularity containers (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif) that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
-#### Additionally, a wrapper script (run_Arima-Oncology-Pipeline-singularity-v0.2.sh) is provided in this repository for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
+#### We provide Docker (https://hub.docker.com/repository/docker/arimaxiang/arima_oncology) and Singularity containers (ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.3.sif) that allow running Arima Oncology pipeline out of the box. You can mount necessary input and output locations and run Arima Oncology pipeline without dealing with tedious installations or library dependencies.
+#### Additionally, a wrapper script (run_Arima-Oncology-Pipeline-singularity-v0.3.sh) is provided in this repository for you to conveniently run the Singularity image by hiding all the mounting steps in a black box so that the only input needed from the users are the FASTQ files and an output location.
 
 ## Using the Singularity image with the wrapper script
 
 #### Just download the *.sif file with the corresponding wrapper script.
 ```
-wget ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.2.sif
-wget https://raw.githubusercontent.com/ArimaGenomics/Arima-Oncology-Pipeline/main/run_Arima-Oncology-Pipeline-singularity-v0.2.sh
+wget ftp://ftp-arimagenomics.sdsc.edu/pub/ARIMA_Oncology_Pipeline/Arima-Oncology-Pipeline-singularity-v0.3.sif
+wget https://raw.githubusercontent.com/ArimaGenomics/Arima-Oncology-Pipeline/main/run_Arima-Oncology-Pipeline-singularity-v0.3.sh
 ```
 
 #### Put them in the same directory and run the command below.
-> bash run_Arima-Oncology-Pipeline-singularity-v0.2.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
+> bash run_Arima-Oncology-Pipeline-singularity-v0.3.sh [-W run_hicup] [-Y run_bam2chicago] [-Z run_chicago] [-G run_genomescan]
                  [-P run_plot] [-C run_hicplot] [-I FASTQ_string] [-w scan_window] [-o out_dir] [-p output_prefix] [-t threads]
 
 ```
@@ -159,7 +159,7 @@ If you would like to run the pipeline with "-C 1" (generate HiC heatmap), these 
 
 ## Arima Pipeline Version
 
-0.2
+0.3
 
 ## Support
 
