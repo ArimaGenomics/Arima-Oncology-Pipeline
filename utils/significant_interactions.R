@@ -101,7 +101,7 @@ for (i in seq(1,length(all_genes_files),1)){
 	# The gene name is located before the first "." in the file name
 	focal.gene <- strsplit(focal.gene.file, "[.]")[[1]][1]
 	# Print gene information
-#	print(paste("Processing", focal.gene, "reads", sep = " "))
+	print(paste("Processing", focal.gene, "reads", sep = " "))
 
 	# Identify gene chromosome - useful for intra-SV analysis
 	focal.gene.chr <- genes$chr[genes$gene == focal.gene]

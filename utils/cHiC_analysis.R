@@ -10,7 +10,7 @@ getCountMtrx <- function(inputdir, geneSet=1:length(list.files())){
 
 	#Get window center position for plotting
 	gene_counts$abs.pos <- NA
-	gene_counts$abs.pos <- as.data.frame(apply(gene_counts, 1, function(x) mean(c(as.numeric(x[2]), as.numeric(x[3]))) + chr_length[chr_length$chr == x[1],]$chr_start))
+	gene_counts$abs.pos <- as.data.frame(apply(gene_counts, 1, function(x) mean(c(as.numeric(x[2]), as.numeric(x[3]))) + chr_length[chr_length$chr == x[1], ]$chr_start))
 	abs.pos <- gene_counts$abs.pos
 
 	#load count data by gene
@@ -18,7 +18,7 @@ getCountMtrx <- function(inputdir, geneSet=1:length(list.files())){
 	for(i in 1:length(sampleFiles)){
 		gene <- unlist(strsplit(sampleFiles[i], "\\."))[1]
 
-		gene_counts[,gene] <- fread(sampleFiles[i], header = FALSE, sep = "\t", select = 4)
+		gene_counts[, gene] <- fread(sampleFiles[i], header = FALSE, sep = "\t", select = 4)
 
 	#	setTxtProgressBar(pb, i)
 	}
@@ -32,7 +32,7 @@ getInterchromMtrx <- function(countMatrix){
 
 	for(i in 5:ncol(interchromCounts)){
 		intra.chr <- genes$chr[genes$gene == colnames(interchromCounts)[i]]
-		interchromCounts[interchromCounts$chr == intra.chr,i] <- NA
+		interchromCounts[interchromCounts$chr == intra.chr, i] <- NA
 	}
 
 	return(interchromCounts)
@@ -47,9 +47,9 @@ getIntrachromMtrx <- function(countMatrix, distance){
 		intra.chr <- genes$chr[genes$gene == colnames(intrachromCounts)[i]]
 		# Add distance criteria
 		gene_mid_point <- genes$mid_gene[genes$gene == colnames(intrachromCounts)[i]]
-		intrachromCounts[(intrachromCounts$chr == intra.chr) & (abs(gene_mid_point - intrachromCounts$mid_window) < distance),i] <- NA
+		intrachromCounts[(intrachromCounts$chr == intra.chr) & (abs(gene_mid_point - intrachromCounts$mid_window) < as.numeric(distance)), i] <- NA
 		# Remove inter-chromosomal interactions
-		intrachromCounts[intrachromCounts$chr != intra.chr,i] <- NA
+		intrachromCounts[intrachromCounts$chr != intra.chr, i] <- NA
 	}
 	intrachromCounts$mid_window <- NULL
 	return(intrachromCounts)

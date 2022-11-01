@@ -63,7 +63,7 @@ echo "Intermediate files will be deleted after run. Use '-c 0' to save files."
 bamfilename="$(basename $INPUT_BAM)"
 # echo $bamfilename
 
-# Check if sorted file exists, create it not
+# Check if sorted file exists, create if not
 INPUT_BAM_SRT=$OUT_DIR/$PREFIX/${bamfilename%.bam}.sortn.bam
 [ -f ${INPUT_BAM_SRT} ] || samtools sort $INPUT_BAM -@ $THREADS -o $INPUT_BAM_SRT
 
@@ -98,40 +98,32 @@ numberOfGenes=$(cat $GENE_LIST | wc -l | cut -d' ' -f1)
 tenPercentOfGenes=$(($numberOfGenes / 10))
 
 #sed 1d $GENE_LIST | while IFS=$'\t' read -r chrom chromStart chromEnd gene
+
+### Updated overlap of gene coordinates with .bam file for memory debugging ###
+
+# Intersect list of genes with reads
+GENE_BAM_OVERLAP=$OUT_DIR/$PREFIX/${bamfilename%.bam}.gene.overlap.bed
+bedtools intersect -abam $INPUT_BAM_SRT -b $GENE_LIST -bed -wb > $GENE_BAM_OVERLAP
+
+# Split reads to individual files per gene
 cat $GENE_LIST | while IFS=$'\t' read -r chrom chromStart chromEnd gene
 do
-    coord="$chrom:$chromStart-$chromEnd"
+	# Get reads per gene
+	grep "$gene" $GENE_BAM_OVERLAP > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.reads.bed
 
-    #Get reads aligned to gene region
-    samtools view $INPUT_BAM_SRT $coord | cut -f1 > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt
-
-    #Check that id files are not empty
-    # if [ -s ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt ] then
-    #     echo "Gene ids saved for gene $gene."
-    # else
-    #     echo "No gene ids found. Is the input bam indexed?"
-
-    #     if [[ "$WARN" =~ 0 ]] then
-    #         exit 1
-    #     fi
-    # fi
-
-    #Get read pairs from regions, save to .bed file for intersect
-    #LC_ALL=C grep -w -F -f ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt < ${IN_DIR}/${PREFIX}.bed > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed
-
-    # Added by Xiang to reduce memory usage
-    awk 'NR==FNR{ids[$0]; next} {if($4 in ids) print} f' ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.ids.txt ${IN_DIR}/${PREFIX}.modified.bed > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed
+	# Obtain read pair coordinates as well
+	cut -f4 ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.reads.bed | sed s@/[12]@@ > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.read.ids.txt
+	awk 'NR==FNR{ids[$0]; next} {if($4 in ids) print} f' ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.read.ids.txt ${IN_DIR}/${PREFIX}.modified.bed > ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed
 
     #Get counts of reads aligned to gene within each sliding window
-    bedtools intersect -c -a $WINDOW_FILE -b ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed > ${OUT_DIR}/${PREFIX}/gene_results/${WINDOW}/all_genes/${gene}.${WINDOW}.bed
+	bedtools intersect -c -a $WINDOW_FILE -b ${OUT_DIR}/${PREFIX}/tmp/${PREFIX}.${gene}.bed > ${OUT_DIR}/${PREFIX}/gene_results/${WINDOW}/all_genes/${gene}.${WINDOW}.bed
 
-	# Increase gene counter after processing each gene
+    # Increase gene counter after processing each gene
 	counter=$(( $counter + 1 ))
 	# Print progress bar after processing every 10% of genes approximately
         if [ $(( $counter % $tenPercentOfGenes )) -eq 0 ] ; then
-            echo "Processed $(( ($counter*100) / $numberOfGenes + 1)) % of genes"
+                echo "Processed $(( ($counter*100) / $numberOfGenes + 1)) % of genes"
         fi
-
 done
 
 # if [[ $CLEANUP =~ 1 ]]; then
